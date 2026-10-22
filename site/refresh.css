@@ -1,0 +1,28 @@
+/* Siltok guide · 2026-10-21 */
+:root{--blue:#2859e8;--ink:#132344}body{background:#f7f9fd;color:var(--ink)}.topbar{background:rgba(255,255,255,.97);border-bottom:1px solid #e4eaf5}.hero{padding-top:74px;padding-bottom:66px}.hero h1{letter-spacing:-2px}.eyebrow{display:inline-block;padding:8px 13px;border:1px solid #d9e4ff;border-radius:30px;background:#edf3ff;color:#2859e8}.guide-step{box-shadow:0 8px 32px #142b5510;border-color:#e0e7f4}.system-grid>section{background:#f7f9ff;border:1px solid #dfe6f8;border-radius:18px}.download{transition:background .2s,transform .2s}.download:hover{transform:translateY(-2px);background:#1845c9}.checksum{overflow-wrap:anywhere;font-family:ui-monospace,monospace;font-size:11px;line-height:1.7}.step-contacts figure{background:white;overflow:hidden}.step-contacts figure img{display:block;width:100%;height:310px;object-fit:contain;background:white;padding:18px;box-sizing:border-box}.step-contacts figure figcaption{border-top:1px solid #edf0f7}.agreement,.status-card{border-color:#dfe6f4}.faq details{background:#fff;border:1px solid #e3e8f2;border-radius:14px}.guide-step,.agreement,.test-section{scroll-margin-top:90px}a:focus-visible,summary:focus-visible{outline:3px solid #87a7ff;outline-offset:4px}@media(max-width:700px){.hero{padding-top:36px;padding-bottom:36px}.hero h1{letter-spacing:-1px}.topbar nav{gap:12px}.topbar nav a{font-size:12px}.step-contacts figure img{height:260px}.checksum{font-size:10px}}
+
+.step-contacts figure img{aspect-ratio:auto;height:340px;padding:8px}.step-contacts figcaption{display:block}.step-contacts figcaption strong,.step-contacts figcaption span{display:block}#guide-contact{scroll-margin-top:100px}@media(max-width:800px){.topbar{height:auto;min-height:72px;padding:12px 20px;flex-wrap:wrap;gap:10px}.topbar nav{display:flex;flex-wrap:wrap;gap:8px 14px}.topbar nav a{font-size:12px}.guide-contact .step-contacts{grid-template-columns:minmax(0,320px);gap:16px}.step-contacts figure img{height:auto;max-height:420px;padding:8px}#guide-contact{scroll-margin-top:140px}}
+
+/* Unified contact posters and aligned installer cards · 2026-10-22 */
+.system-grid>section{display:grid;grid-template-rows:auto auto minmax(3.3em,auto) 52px minmax(3.2em,auto) auto;align-content:start;row-gap:0;padding:24px}
+.system-grid .system-description{font-size:15px;line-height:1.65;margin:0 0 18px}
+.system-grid .download{margin:0!important;min-height:52px;line-height:1.3;gap:16px;padding:14px 16px!important}
+.system-grid .download span{white-space:nowrap;flex:none}
+.download-meta{display:grid;grid-template-columns:54px minmax(0,1fr);gap:8px;font-size:11px;line-height:1.65;color:#71819a;align-items:start;min-width:0}
+.download-meta>span{font-size:10px;font-weight:600;white-space:nowrap;padding-top:1px}
+.download-meta code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere;word-break:break-all;font-size:11px}
+.file-meta{padding-top:12px}.hash-meta{padding-top:4px}
+@supports(grid-template-rows:subgrid){.system-grid>section{grid-template-rows:subgrid;grid-row:span 6}.system-grid{row-gap:0}}
+.step-contacts{grid-template-columns:repeat(2,minmax(0,320px));gap:24px}
+.step-contacts .contact-card{padding:20px 16px 16px;border-radius:18px;display:flex;flex-direction:column;align-items:stretch;background:#fff}
+.step-contacts .poster-frame{position:relative;width:min(100%,260px);aspect-ratio:890/1370;margin:0 auto;overflow:hidden;border-radius:12px;container-type:inline-size}
+.step-contacts .poster-frame .poster-base{display:block;width:100%;height:100%;max-height:none;aspect-ratio:890/1370;object-fit:fill;padding:0;border-radius:0}
+.wang-poster .poster-qr{position:absolute;left:24.4%;top:21.8%;width:51.4%;aspect-ratio:1;background:#fff;overflow:hidden;border-radius:4px}
+.step-contacts .poster-qr img{width:100%;height:100%;max-height:none;aspect-ratio:1;object-fit:contain;padding:0;border-radius:0}
+.wang-poster .poster-person{position:absolute;left:61%;top:64.4%;width:16%;height:4.7%;display:flex;justify-content:center;align-items:center;color:#fff;background:#006de3;font-size:4.6cqw;line-height:1;font-family:"PingFang SC","Microsoft YaHei",sans-serif;white-space:nowrap}
+.step-contacts .contact-card figcaption{margin-top:16px;padding:14px 0 0;border-top:1px solid #e8edf5;display:block}
+.step-contacts .contact-card figcaption strong{font-size:17px;line-height:1.5}.step-contacts .contact-card figcaption span{font-size:13px;line-height:1.6;color:#617089;margin-top:2px}
+@media(max-width:800px){.system-grid>section{grid-row:auto;grid-template-rows:auto auto auto 52px auto auto;row-gap:0}.guide-contact .step-contacts{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.step-contacts .contact-card{padding:14px 12px}.step-contacts .poster-frame{max-width:260px}}
+@media(max-width:520px){.guide-contact .step-contacts{grid-template-columns:minmax(0,320px)}.system-grid>section{padding:20px}.download-meta{grid-template-columns:48px minmax(0,1fr);gap:6px}}
+
+.hash-meta code>span{display:block}
