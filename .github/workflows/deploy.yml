@@ -1,0 +1,59 @@
+name: Publish Siltok company guide
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Copy verified website into company repository
+        run: |
+          if [ ! -f site/index.html ]; then
+            migration_dir=$(mktemp -d)
+            git -C "$migration_dir" init
+            git -C "$migration_dir" fetch --depth=1 https://github.com/casie223344-cmd/siltok-guide.git 264f8856ebc6200a8185a4cad3f8d9bc4bf3037b
+            git -C "$migration_dir" checkout --detach FETCH_HEAD
+            cp -R "$migration_dir/site" site
+          fi
+      - name: Verify installers
+        run: |
+          python3 - <<'PYTHON'
+          from pathlib import Path
+          import json,hashlib
+          root=Path('site')
+          for name,entry in json.loads((root/'downloads/manifest.json').read_text()).items():
+              sha=hashlib.sha256();size=0
+              for chunk in entry['chunks']:
+                  data=(root/chunk).read_bytes();sha.update(data);size+=len(data)
+              assert sha.hexdigest()==entry['sha256'] and size==entry['bytes'],name
+              print(name,'verified')
+          assert 'casie223344-cmd' not in (root/'index.html').read_text()
+          PYTHON
+      - name: Save website to company repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site
+          if ! git diff --cached --quiet; then
+            git commit -m "Add Siltok company guide and verified installers"
+            git push
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+      - name: Publish company website
+        id: deployment
+        uses: actions/deploy-pages@v4
