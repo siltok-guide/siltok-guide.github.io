@@ -4,7 +4,7 @@ on:
     branches: [main]
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 concurrency:
@@ -18,38 +18,44 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v6
-      - name: Copy verified website into company repository
-        run: |
-          if [ ! -f site/index.html ]; then
-            migration_dir=$(mktemp -d)
-            git -C "$migration_dir" init
-            git -C "$migration_dir" fetch --depth=1 https://github.com/casie223344-cmd/siltok-guide.git 264f8856ebc6200a8185a4cad3f8d9bc4bf3037b
-            git -C "$migration_dir" checkout --detach FETCH_HEAD
-            cp -R "$migration_dir/site" site
-          fi
-      - name: Verify installers
+      - name: Prepare and verify installers from release assets
         run: |
           python3 - <<'PYTHON'
           from pathlib import Path
-          import json,hashlib
-          root=Path('site')
-          for name,entry in json.loads((root/'downloads/manifest.json').read_text()).items():
-              sha=hashlib.sha256();size=0
-              for chunk in entry['chunks']:
-                  data=(root/chunk).read_bytes();sha.update(data);size+=len(data)
-              assert sha.hexdigest()==entry['sha256'] and size==entry['bytes'],name
-              print(name,'verified')
-          assert 'casie223344-cmd' not in (root/'index.html').read_text()
+          import hashlib, json, shutil, tempfile, urllib.request
+          root = Path('site')
+          manifest = json.loads((root / 'downloads/manifest.json').read_text())
+          with tempfile.TemporaryDirectory() as temporary:
+              for name, entry in manifest.items():
+                  installer = Path(temporary) / name
+                  request = urllib.request.Request(entry['sourceUrl'], headers={'User-Agent': 'Siltok-guide-build'})
+                  digest = hashlib.sha256()
+                  size = 0
+                  with urllib.request.urlopen(request, timeout=120) as response, installer.open('wb') as output:
+                      while data := response.read(4 * 1024 * 1024):
+                          output.write(data)
+                          digest.update(data)
+                          size += len(data)
+                  assert size == entry['bytes'] and digest.hexdigest() == entry['sha256'], name + ': release asset mismatch'
+                  assert len(entry['chunks']) == len(entry['chunkSha256'])
+                  rebuilt = hashlib.sha256()
+                  with installer.open('rb') as source:
+                      for chunk, expected in zip(entry['chunks'], entry['chunkSha256']):
+                          data = source.read(4 * 1024 * 1024)
+                          assert data and hashlib.sha256(data).hexdigest() == expected, chunk
+                          target = root / chunk
+                          target.parent.mkdir(parents=True, exist_ok=True)
+                          target.write_bytes(data)
+                          rebuilt.update(data)
+                      assert not source.read(1), name + ': unexpected trailing bytes'
+                  assert rebuilt.hexdigest() == entry['sha256'], name + ': rebuilt installer mismatch'
+                  print(name, 'verified:', size, 'bytes')
+          for old in ['downloads/windows', 'downloads/macos']:
+              shutil.rmtree(root / old, ignore_errors=True)
+          (root / 'assets/wecom-linan.jpg').unlink(missing_ok=True)
+          assert '李楠' not in (root / 'index.html').read_text()
+          assert (root / 'assets/siltok-creator-community-qr.jpg').is_file()
           PYTHON
-      - name: Save website to company repository
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site
-          if ! git diff --cached --quiet; then
-            git commit -m "Add Siltok company guide and verified installers"
-            git push
-          fi
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
